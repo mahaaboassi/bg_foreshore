@@ -5,7 +5,7 @@ const connectDB = require('./config/db');
 const {router} = require("./api/auth");
 const { adminRouter } = require('./api/admin');
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
 // Middleware
 app.use(cors());

@@ -8,24 +8,9 @@
   ],
   "routes": [
     {
-      "src": "/api/auth/(.*)",
-      "dest": "index.js"
-    },
-    {
-      "src": "/api/admin/(.*)",
-      "dest": "index.js"
-    },
-    {
       "src": "/(.*)",
       "dest": "index.js"
     }
-  ],
-  "functions": {
-    "index.js": {
-      "includeFiles": [
-        "models/**",
-        "controller/**" 
-      ]
-    }
-  }
+  ]
+
 }
