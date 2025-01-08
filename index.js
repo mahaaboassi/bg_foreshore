@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
-const {router} = require("./route/auth");
-const { adminRouter } = require('./route/admin');
+const {router} = require("./api/auth");
+const { adminRouter } = require('./api/admin');
 const app = express();
 const PORT = 3000;
 
