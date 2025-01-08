@@ -1,4 +1,4 @@
-const type = require("../models/type");
+const type = require("../models/Type");
 const jwt = require("jsonwebtoken");
 const path = require("path")
 const fs = require('fs');
