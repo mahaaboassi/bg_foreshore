@@ -2,40 +2,74 @@ const path = require("path")
 const multer = require("multer")
 const fs = require('fs');
 
+
+
+// Middleware to set category for the "type" endpoint
+const setCategory = (category) => (req, res, next) => {
+    req.category = category; // Add category to the request object
+    next();
+};
+
 var storage = multer.diskStorage({
     destination  : function(req,file,cb){
         const category = req.category || 'default'; // Backend defines the category
-
-        cb(null, `uploads/${category}`); // Set the upload directory
+        const uploadDir = path.join(__dirname, `uploads/${category}`);
+         // Create directory if it doesn't exist
+         fs.mkdirSync(uploadDir, { recursive: true });
+        
+         cb(null, uploadDir);
+        // cb(null, `uploads/${category}`); // Set the upload directory
     },
     filename : function(req,file,cb){
-        
-        let ext = path.extname(file.originalname)
-        cb(null, Date.now()+ext)
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        // let ext = path.extname(file.originalname)
+        // cb(null, Date.now()+ext)
     }
 })
 
-var uplaod = multer({
+const  upload = multer({
     storage : storage,
     fileFilter : function(req,file,callback){
-        if(
-            file.mimetype === "image/png" ||
-            file.mimetype === "image/jpg" ||
-            file.mimetype === "image/jpeg" ||
-            file.mimetype === "image/gif" ||
-            file.mimetype === "image/webp" ||
-            file.mimetype === "image/bmp"
+        const allowedMimeTypes = [
+            "image/png", 
+            "image/jpg", 
+            "image/jpeg", 
+            "image/gif", 
+            "image/webp", 
+            "image/bmp"
+        ];
     
-        ){
-            callback(null,true)
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            callback(null, true);
         } else {
-            console.log("Only jpg & png file")
-            callback(null,false)
+            console.error(`Rejected file: ${file.originalname}. Unsupported file type: ${file.mimetype}`);
+            callback(new Error('Unsupported file type. Only image files are allowed.'), false);
         }
     },
     limits : {
         fieldSize : 1024 *1024 *2
     }
 })
-
-module.exports = uplaod
+// Error handling middleware for multer
+const multerErrorHandler = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        // Multer-specific errors
+        return res.status(400).json({
+            error: 'File upload error',
+            message: err.message
+        });
+    } else if (err) {
+        // Other errors (like file type)
+        return res.status(400).json({
+            error: 'Upload error',
+            message: err.message
+        });
+    }
+    next();
+};
+module.exports = {
+    setCategory,
+    upload,
+    multerErrorHandler
+}
