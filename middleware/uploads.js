@@ -1,7 +1,6 @@
-const path = require("path")
-const multer = require("multer")
-const fs = require('fs');
-
+const multer = require('multer');
+const { put } = require('@vercel/blob');
+const path = require('path');
 
 
 // Middleware to set category for the "type" endpoint
@@ -10,68 +9,80 @@ const setCategory = (category) => (req, res, next) => {
     next();
 };
 
-var storage = multer.diskStorage({
-    destination  : function(req,file,cb){
-        const category = req.category || 'default'; // Backend defines the category
-        // const uploadDir = path.join(__dirname, `uploads/${category}`);
-        const uploadPath = path.join(process.cwd(), 'uploads', category);
-  
-         // Create directory if it doesn't exist
-         fs.mkdirSync(uploadPath, { recursive: true });
-        
-         cb(null, uploadPath);
-        // cb(null, `uploads/${category}`); // Set the upload directory
-    },
-    filename : function(req,file,cb){
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-        // let ext = path.extname(file.originalname)
-        // cb(null, Date.now()+ext)
-    }
-})
+// Use memory storage to avoid file system writes
+const storage = multer.memoryStorage();
 
-const  upload = multer({
-    storage : storage,
-    fileFilter : function(req,file,callback){
-        const allowedMimeTypes = [
-            "image/png", 
-            "image/jpg", 
-            "image/jpeg", 
-            "image/gif", 
-            "image/webp", 
-            "image/bmp"
-        ];
-    
-        if (allowedMimeTypes.includes(file.mimetype)) {
-            callback(null, true);
+const upload = multer({ 
+    storage: storage,
+    fileFilter: function(req, file, callback) {
+        const allowedTypes = /jpeg|jpg|png|gif|webp/;
+        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = allowedTypes.test(file.mimetype);
+
+        if (extname && mimetype) {
+            return callback(null, true);
         } else {
-            console.error(`Rejected file: ${file.originalname}. Unsupported file type: ${file.mimetype}`);
-            callback(new Error('Unsupported file type. Only image files are allowed.'), false);
+            callback(new Error('Error: Only image files are allowed!'), false);
         }
     },
-    limits : {
-        fieldSize : 1024 *1024 *2
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB file size limit
     }
-})
-// Error handling middleware for multer
-const multerErrorHandler = (err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
-        // Multer-specific errors
-        return res.status(400).json({
-            error: 'File upload error',
-            message: err.message
+});
+
+// Middleware to upload to Vercel Blob
+const uploadToVercelBlob = async (req, res, next) => {
+
+    try {
+
+        const token = process.env.BLOB_READ_WRITE_TOKEN;
+
+        if (!token) {
+            throw new Error('BLOB_READ_WRITE_TOKEN is not configured.');
+        }
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+       
+        const category = req.category || 'default';
+        const filename = `${category}/${Date.now()}-${req.file.originalname}`;
+
+        const blob = await put(filename, req.file.buffer, {
+            access: 'public',
+            contentType: req.file.mimetype
         });
-    } else if (err) {
-        // Other errors (like file type)
-        return res.status(400).json({
-            error: 'Upload error',
-            message: err.message
+
+        const fileInfo = {
+            // Unique identifier for the file
+            id: blob.url.split('/').pop(), 
+            
+            // Full public URL - use this to access the file from frontend
+            url: blob.url,
+            
+            // Path used for storage reference
+            path: filename,
+            
+            // Original file details
+            originalName: req.file.originalname,
+            category: category,
+            mimeType: req.file.mimetype,
+            size: req.file.size
+        };
+        // Attach file info to request for use in next middleware/controller
+        req.fileInfo = fileInfo;
+
+        next();
+    } catch (error) {
+        console.error('Vercel Blob Upload Error:', error);
+        res.status(500).json({ 
+            error: 'File upload failed', 
+            details: error.message 
         });
     }
-    next();
 };
+
 module.exports = {
-    setCategory,
     upload,
-    multerErrorHandler
-}
+    uploadToVercelBlob,
+    setCategory
+};

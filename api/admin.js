@@ -1,13 +1,14 @@
 const express = require("express");
 const { AddType, UpdateType, DeleteType, GetType } = require("../controller/type");
-const {upload,setCategory } = require('../middleware/uploads');
+const { upload , uploadToVercelBlob , setCategory } = require('../middleware/uploads');
+const { authenticate , authorizeAdmin} = require("../middleware/auth")
 const { Add, Update, Delete, Get, AddSubFeature, UpdateSubFeature, DeleteSubFeature } = require("../controller/feature");
 
 const adminRouter = express.Router();
 
 
 // Route to add a new type
-adminRouter.post("/addType", setCategory('type'),upload.single("photo"), AddType);
+adminRouter.post("/addType", setCategory('type'), authenticate,authorizeAdmin,upload.single("photo"),uploadToVercelBlob, AddType);
 adminRouter.put("/updateType/:id",setCategory('type'), upload.single("photo"),UpdateType);
 adminRouter.delete("/deleteType/:id", DeleteType);
 adminRouter.get("/getAllTypes", GetType);

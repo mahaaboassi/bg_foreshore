@@ -2,12 +2,33 @@ const type = require("../models/Type");
 const jwt = require("jsonwebtoken");
 const path = require("path")
 const fs = require('fs');
-const { uploadToVercelBlob } = require("../middleware/uploads");
 
 const AddType = async (req, res) => {
     const {name , description } = req.body
+    // Extract the token from the Authorization header
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+
+    if (!token) {
+        return res.status(403).json({
+            error: 1,
+            data: [],
+            message: "Token is required for authentication.",
+            status: 403,
+        });
+       }
        
     try {
+         // Verify the token
+         const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Your secret key here
+         // Check if the user is an admin
+         if (decoded.role !== 'admin') {
+             return res.status(403).json({
+                 error: 1,
+                 data: [],
+                 message: "You do not have the necessary permissions to add a type.",
+                 status: 403,
+             });
+         }
         if (!name ) {
           return res.status(400).json({
             error: 1,
@@ -30,8 +51,9 @@ const AddType = async (req, res) => {
               message: 'File upload failed!',
               status : 400
             });
+          }else{
+            typeSave.photo = `${req.file.path}`
           }
-        data.photo = req.fileInfo;
         await typeSave.save();
 
         res.status(200).json({
