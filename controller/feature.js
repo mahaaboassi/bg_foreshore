@@ -1,69 +1,47 @@
 const feature = require("../models/feature");
-const jwt = require("jsonwebtoken");
-const path = require("path")
-const fs = require('fs');
+const { del } = require('@vercel/blob');
+
 
 const Add = async (req, res) => {
-    const {name , description } = req.body
-    // Extract the token from the Authorization header
-    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+    const {name_ar, name_en, description_ar , description_en } = req.body
 
-    if (!token) {
-        return res.status(403).json({
-            error: 1,
-            data: [],
-            message: "Token is required for authentication.",
-            status: 403,
-        });
-       }
        
     try {
-         // Verify the token
-         const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Your secret key here
-         // Check if the user is an admin
-         if (decoded.role !== 'admin') {
-             return res.status(403).json({
-                 error: 1,
-                 data: [],
-                 message: "You do not have the necessary permissions to add a type.",
-                 status: 403,
-             });
-         }
-        if (!name ) {
+        if (!name_ar || !name_en ) {
           return res.status(400).json({
             error: 1,
             data : [],
-            message: "Name field is required.",
+            message: "Name fields are required.",
             status : 400
           });
         }
 
         const data = {
-            name: name,
-            description: description || "",  // If description is provided, use it; otherwise, set it to an empty string.
+            name_ar : name_ar,
+            name_en : name_en,
+            added_by : req.user.id,
+            description_en : description_en || "",
+            description_ar : description_ar || "",  // If description is provided, use it; otherwise, set it to an empty string.
         };
-        
-        const featureSave = new feature(data);
-          // Handle the file upload if a file is uploaded
         if (!req.file) {
-            // If no file is uploaded, send an error response (file is required)
-            return res.status(400).json({
-                error: 1,
-                data: [],
-                message: 'File upload is required.',
-                status: 400
-            });
-        } else {
-            // Save the photo path to the sub-feature
-            featureSave.photo = req.file.path;  // Assuming you want to attach the photo to the sub-feature
-        }
+            return res.status(500).json({
+                        error: 1,
+                        data: [],
+                        message: 'No file provided for upload.', 
+                        status: 400
+                    });
+          }
+        data.photo = req.fileInfo;
+        const featureSave = new feature(data);
         await featureSave.save();
 
         res.status(200).json({
             error : 0,
             data : { id: featureSave._id , 
-                 name : featureSave.name ,
-                description : featureSave.description ,
+                name_ar : featureSave.name_ar ,
+                name_en : featureSave.name_en ,
+                description_ar : featureSave.description_ar ,
+                description_en : featureSave.description_en ,
                 photo : featureSave.photo
             },
             message : "Add Feature successfully!"
@@ -169,33 +147,9 @@ const Delete = async (req, res) => {
 }
 const Update = async (req, res) => {
     const { id } = req.params; // Get the ID from the URL parameter
-    const { name , description } = req.body
-    // Extract the token from the Authorization header
-    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-
-    if (!token) {
-        return res.status(403).json({
-            error: 1,
-            data: [],
-            message: "Token is required for authentication.",
-            status: 403,
-        });
-    }
+    const { name_ar, name_en ,description_ar , description_en } = req.body
 
     try {
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Check if the user is an admin
-        if (decoded.role !== 'admin') {
-            return res.status(403).json({
-                error: 1,
-                data: [],
-                message: "You do not have the necessary permissions to delete a feature.",
-                status: 403,
-            });
-        }
-
         // Check if the id is provided
         if (!id) {
             return res.status(400).json({
@@ -210,8 +164,10 @@ const Update = async (req, res) => {
         const featureToUpdate = await feature.findOneAndUpdate(
             { _id: id },  // Find the document by ID
             {
-                name: name,
-                description: description ? description : ""  // Optional field, default to an empty string
+                name_ar : name_ar,
+                name_en : name_en,
+                description_ar : description_ar || "",
+                description_en : description_en ||  ""  // Optional field, default to an empty string
             },
             { new: true }  // Ensure the updated document is returned
         );
@@ -224,14 +180,27 @@ const Update = async (req, res) => {
                 status: 404
             });
         }
-        // If a new photo is uploaded, handle it
+       
+        
         if (req.file) {
-            // Delete the old file if it exists
-            if (featureToUpdate.photo) {
-          
-                fs.unlinkSync(path.resolve(featureToUpdate.photo)); // This will delete the old file
-            }   
-            featureToUpdate.photo = `${req.file.path}`;
+               // Delete the old photo from Vercel Blob (if it exists)
+               if (featureToUpdate.photo) {
+                const oldPhotoUrl = featureToUpdate.photo.url;
+                const oldFileName = oldPhotoUrl.split('/').pop(); // Extract file name from the URL
+
+                try {
+                    await del(oldFileName, {
+                        token: process.env.BLOB_XX_ABCDEFGHIJKLMNOPQRSTUVWXY_READ_WRITE_TOKEN
+                    });
+                    console.log(`Deleted old photo: ${oldFileName}`);
+                } catch (deleteError) {
+                    console.warn('Failed to delete previous photo:', deleteError);
+                    // Continue with the update even if deletion fails
+                }
+            }
+
+            // Update the photo field with the new file URL from Vercel Blob
+            featureToUpdate.photo = req.fileInfo;
         }
         await featureToUpdate.save()
         
@@ -239,23 +208,16 @@ const Update = async (req, res) => {
         res.status(200).json({
             error: 0,
             data: { id : featureToUpdate._id , 
-                name : featureToUpdate.name ,
-               description : featureToUpdate.description ,
+                name_ar : featureToUpdate.name_ar ,
+                name_en : featureToUpdate.name_en ,
+               description_ar : featureToUpdate.description_ar ,
+               description_en : featureToUpdate.description_en ,
                photo : featureToUpdate.photo
            },
             message: "Feature updated successfully."
         });
         
     } catch (error) {
-         // Handle token expiration error
-         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                error: 1,
-                data: [],
-                message: "Token has expired. Please login again.",
-                status: 401
-            });
-        }
 
         // Handle other errors
         console.error(error);
@@ -325,31 +287,10 @@ const Get = async (req, res) => {
 }
 // Sub Feature
 const AddSubFeature = async (req, res) => {
-    const {name , description ,id_feature } = req.body
-    // Extract the token from the Authorization header
-    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+    const {name_ar, name_en , description_ar , description_en  ,id_feature } = req.body
 
-    if (!token) {
-        return res.status(403).json({
-            error: 1,
-            data: [],
-            message: "Token is required for authentication.",
-            status: 403,
-        });
-       }
        
     try {
-         // Verify the token
-         const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Your secret key here
-         // Check if the user is an admin
-         if (decoded.role !== 'admin') {
-             return res.status(403).json({
-                 error: 1,
-                 data: [],
-                 message: "You do not have the necessary permissions to add a feature.",
-                 status: 403,
-             });
-         }
          // Check if the id is provided
          if (!id_feature) {
             return res.status(400).json({
@@ -368,61 +309,51 @@ const AddSubFeature = async (req, res) => {
                 status : 404
               });
          }
-        if (!name ) {
+        if (!name_ar  || !name_en   ) {
           return res.status(400).json({
             error: 1,
             data : [],
-            message: "Name field is required.",
+            message: "Name fields are required.",
             status : 400
           });
         }
         const subFeatureData = {
-            name: name,
-            description: description || "",  // If description is provided, use it; otherwise, set it to an empty string.
+            name_en : name_en,
+            name_ar : name_ar,
+            added_by : req.user.id,
+            description_ar : description_ar || "",
+            description_en : description_en || "",  // If description is provided, use it; otherwise, set it to an empty string.
         };
-        // Handle the file upload if a file is uploaded
         if (!req.file) {
-            // If no file is uploaded, send an error response (file is required)
-            return res.status(400).json({
-                error: 1,
-                data: [],
-                message: 'File upload is required.',
-                status: 400
-            });
-        } else {
-            // Save the photo path to the sub-feature
-            subFeatureData.photo = req.file.path;  // Assuming you want to attach the photo to the sub-feature
-        }
+            return res.status(500).json({
+                        error: 1,
+                        data: [],
+                        message: 'No file provided for upload.',
+                        status: 400
+                    });
+          }
+        // Handle the file upload if a file is uploaded
+        subFeatureData.photo = req.fileInfo; 
         rootFeature.subFeatures.push(subFeatureData);  // Add the sub-feature to the feature
         await rootFeature.save();  // Save the updated feature
-
-        
-
         res.status(200).json({
             error : 0,
             data: {
-                id: rootFeature.subFeatures[rootFeature.subFeatures.length - 1]._id,  // New sub-feature ID
-                name: subFeatureData.name,
-                description: subFeatureData.description,
+                id : rootFeature.subFeatures[rootFeature.subFeatures.length - 1]._id,  // New sub-feature ID
+                name_ar : subFeatureData.name_ar,
+                name_en : subFeatureData.name_en,
+                description_ar : subFeatureData.description_ar,
+                description_en : subFeatureData.description_en,
                 photo: subFeatureData.photo ,
                 root_feature :{
                     id: rootFeature._id,  // ID of the root feature
-                    name: rootFeature.name, 
+                    name_ar : rootFeature.name_ar,
+                    name_en : rootFeature.name_en,
                 }
             },
             message: "Sub-feature added successfully!"
         });
       } catch (error) {
-        // Handle token expiration error
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                error: 1,
-                data: [],
-                message: "Token has expired. Please login again.",
-                status: 401
-            });
-        }
-
         // Handle other errors
         console.error(error);
         res.status(500).json({
@@ -433,32 +364,10 @@ const AddSubFeature = async (req, res) => {
       }
 }
 const UpdateSubFeature = async (req, res) => {
-    const {name , description ,id_feature } = req.body
+    const {name_ar ,name_en , description_en, description_ar ,id_feature } = req.body
     const { id } = req.params
-    // Extract the token from the Authorization header
-    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-
-    if (!token) {
-        return res.status(403).json({
-            error: 1,
-            data: [],
-            message: "Token is required for authentication.",
-            status: 403,
-        });
-       }
        
     try {
-         // Verify the token
-         const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Your secret key here
-         // Check if the user is an admin
-         if (decoded.role !== 'admin') {
-             return res.status(403).json({
-                 error: 1,
-                 data: [],
-                 message: "You do not have the necessary permissions to add a feature.",
-                 status: 403,
-             });
-         }
          if (!id ) {
             return res.status(400).json({
                 error: 1,
@@ -494,29 +403,44 @@ const UpdateSubFeature = async (req, res) => {
                 status : 404
               });
          }
-        if (!name ) {
+        if (!name_ar || !name_en ) {
           return res.status(400).json({
             error: 1,
             data : [],
-            message: "Name field is required.",
+            message: "Name fields are required.",
             status : 400
           });
         }
         // Update the sub-feature fields
-        if (name) currentFeature.name = name;
-        if (description) currentFeature.description = description;
-
+        if (name_ar) currentFeature.name_ar = name_ar;
+        if (name_en) currentFeature.name_en = name_en;
+        if (description_ar) currentFeature.description_ar = description_ar;
+        if (description_en) currentFeature.description_en = description_en;
+         // If a new photo is uploaded, handle it
+         
         // Handle the file upload if a file is uploaded
         if (req.file) {
-            // Delete the old file if it exists
-            if (currentFeature.photo) {
-          
-                fs.unlinkSync(path.resolve(currentFeature.photo)); // This will delete the old file
-            }   
-            currentFeature["photo"] = `${req.file.path}`;
+             // Delete the old photo from Vercel Blob (if it exists)
+             if (currentFeature.photo) {
+                const oldPhotoUrl = currentFeature.photo.url;
+                const oldFileName = oldPhotoUrl.split('/').pop(); // Extract file name from the URL
+
+                try {
+                    await del(oldFileName, {
+                        token: process.env.BLOB_XX_ABCDEFGHIJKLMNOPQRSTUVWXY_READ_WRITE_TOKEN
+                    });
+                    console.log(`Deleted old photo: ${oldFileName}`);
+                } catch (deleteError) {
+                    console.warn('Failed to delete previous photo:', deleteError);
+                    // Continue with the update even if deletion fails
+                }
+            }
+
+            // Update the photo field with the new file URL from Vercel Blob
+            currentFeature.photo = req.fileInfo;
 
         }
-        rootFeature.subFeatures.push(subFeatureData);  // Add the sub-feature to the feature
+        rootFeature.subFeatures.push(currentFeature);  // Add the sub-feature to the feature
         await rootFeature.save();  // Save the updated feature
 
         
@@ -525,27 +449,20 @@ const UpdateSubFeature = async (req, res) => {
             error : 0,
             data: {
                 id: currentFeature._id,  // New sub-feature ID
-                name: currentFeature.name,
-                description: currentFeature.description,
+                name_ar: currentFeature.name_ar,
+                name_en: currentFeature.name_en,
+                description_ar: currentFeature.description_ar,
+                description_en: currentFeature.description_en,
                 photo: currentFeature.photo ,
                 root_feature :{
                     id: rootFeature._id,  // ID of the root feature
-                    name: rootFeature.name, 
+                    name_ar: rootFeature.name_ar, 
+                    name_en: rootFeature.name_en,
                 }
             },
             message: "Sub-feature added successfully!"
         });
       } catch (error) {
-        // Handle token expiration error
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                error: 1,
-                data: [],
-                message: "Token has expired. Please login again.",
-                status: 401
-            });
-        }
-
         // Handle other errors
         console.error(error);
         res.status(500).json({

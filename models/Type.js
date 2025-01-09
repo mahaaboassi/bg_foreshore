@@ -1,13 +1,22 @@
 const mongoose = require("mongoose")
 
 const typeSchema = new mongoose.Schema({
-    name : {
+    name_ar : {
         type : String,
         required : true,
         minlength: [3, 'Name must be at least 3 characters long'],
         maxlength: [50, 'Name must be less than 50 characters long']
     },
-    description : {
+    name_en : {
+        type : String,
+        required : true,
+        minlength: [3, 'Name must be at least 3 characters long'],
+        maxlength: [50, 'Name must be less than 50 characters long']
+    },
+    description_ar : {
+        type : String,
+    },
+    description_en : {
         type : String,
     },
     photo :{
@@ -20,6 +29,7 @@ const typeSchema = new mongoose.Schema({
             size: { type: Number }
         }
     },
+    added_by :{type : String, required : true},
     date: { type: Date, default: Date.now },
 })
 

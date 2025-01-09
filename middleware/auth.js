@@ -35,6 +35,7 @@ const authorizeAdmin = (req, res, next) => {
             status: 403,
         });
     }
+    req.user = decoded;
     next();
 };
 

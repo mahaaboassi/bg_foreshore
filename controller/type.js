@@ -1,59 +1,51 @@
 const type = require("../models/Type");
-const jwt = require("jsonwebtoken");
-const path = require("path")
-const fs = require('fs');
-const { uploadToVercelBlob } = require("../middleware/uploads");
+const { del } = require('@vercel/blob');
+
 
 const AddType = async (req, res) => {
-    const {name , description } = req.body
-       
+    const {name_ar, name_en, description_ar , description_en , } = req.body
     try {
-        if (!name ) {
+        if (!name_ar || !name_en) {
           return res.status(400).json({
             error: 1,
             data : [],
-            message: "Name field is required.",
+            message: "Name fields are required.",
             status : 400
           });
         }
 
         const data = {
-            name: name,
-            description: description || "",  // If description is provided, use it; otherwise, set it to an empty string.
+            name_ar : name_ar,
+            name_en : name_en,
+            added_by : req.user.id,
+            description_en : description_en || "",
+            description_ar : description_ar || "",  // If description is provided, use it; otherwise, set it to an empty string.
         };
-        
-        const typeSave = new type(data);
+
         if (!req.file) {
-            return res.status(400).json({
-              error: 1,
-              data : [],
-              message: 'File upload failed!',
-              status : 400
-            });
+            return res.status(500).json({
+                        error: 1,
+                        data: [],
+                        message: 'No file provided for upload.', 
+                        status: 400
+                    });
           }
         data.photo = req.fileInfo;
+        const typeSave = new type(data);
         await typeSave.save();
 
         res.status(200).json({
             error : 0,
             data : { id:typeSave._id , 
-                 name : typeSave.name ,
-                description : typeSave.description ,
+                name_ar : typeSave.name_ar ,
+                name_en : typeSave.name_en ,
+                description_en : typeSave.description_en ,
+                description_ar : typeSave.description_ar ,
                 photo : typeSave.photo
             },
             message : "Add Type successfully!"
         });
       } catch (error) {
-        // Handle token expiration error
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                error: 1,
-                data: [],
-                message: "Token has expired. Please login again.",
-                status: 401
-            });
-        }
-
         // Handle other errors
         console.error(error);
         res.status(500).json({
@@ -65,33 +57,7 @@ const AddType = async (req, res) => {
 }
 const DeleteType = async (req, res) => {
     const { id } = req.params; // Get the ID from the URL parameter
-
-    // Extract the token from the Authorization header
-    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-
-    if (!token) {
-        return res.status(403).json({
-            error: 1,
-            data: [],
-            message: "Token is required for authentication.",
-            status: 403,
-        });
-    }
-
     try {
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Check if the user is an admin
-        if (decoded.role !== 'admin') {
-            return res.status(403).json({
-                error: 1,
-                data: [],
-                message: "You do not have the necessary permissions to delete a type.",
-                status: 403,
-            });
-        }
-
         // Check if the id is provided
         if (!id) {
             return res.status(400).json({
@@ -101,7 +67,6 @@ const DeleteType = async (req, res) => {
                 status: 400
             });
         }
-
         // Find and delete the type by id
         const typeToDelete = await type.findByIdAndDelete(id);
 
@@ -122,16 +87,6 @@ const DeleteType = async (req, res) => {
         });
 
     } catch (error) {
-         // Handle token expiration error
-         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                error: 1,
-                data: [],
-                message: "Token has expired. Please login again.",
-                status: 401
-            });
-        }
-
         // Handle other errors
         console.error(error);
         res.status(500).json({
@@ -144,32 +99,9 @@ const DeleteType = async (req, res) => {
 }
 const UpdateType = async (req, res) => {
     const { id } = req.params; // Get the ID from the URL parameter
-    const { name , description } = req.body
-    // Extract the token from the Authorization header
-    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-
-    if (!token) {
-        return res.status(403).json({
-            error: 1,
-            data: [],
-            message: "Token is required for authentication.",
-            status: 403,
-        });
-    }
+    const { name_ar, name_en ,description_ar , description_en } = req.body
 
     try {
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Check if the user is an admin
-        if (decoded.role !== 'admin') {
-            return res.status(403).json({
-                error: 1,
-                data: [],
-                message: "You do not have the necessary permissions to delete a type.",
-                status: 403,
-            });
-        }
 
         // Check if the id is provided
         if (!id) {
@@ -185,8 +117,10 @@ const UpdateType = async (req, res) => {
         const typeToUpdate = await type.findOneAndUpdate(
             { _id: id },  // Find the document by ID
             {
-                name: name,
-                description: description ? description : ""  // Optional field, default to an empty string
+                name_ar : name_ar,
+                name_en : name_en,
+                description_en : description_en || "",
+                description_ar : description_ar || ""  // Optional field, default to an empty string
             },
             { new: true }  // Ensure the updated document is returned
         );
@@ -200,15 +134,27 @@ const UpdateType = async (req, res) => {
             });
         }
         // If a new photo is uploaded, handle it
+        
         if (req.file) {
-            // Delete the old file if it exists
-            if (typeToUpdate.photo) {
-
-                fs.unlinkSync(path.resolve(typeToUpdate.photo)); // This will delete the old file
-            }
-            
-            // Save the new file path
-            typeToUpdate.photo = `${req.file.path}`;
+                      // Delete the old photo from Vercel Blob (if it exists)
+                      if (typeToUpdate.photo) {
+                        const oldPhotoUrl = typeToUpdate.photo.url;
+                        const oldFileName = oldPhotoUrl.split('/').pop(); // Extract file name from the URL
+        
+                        try {
+                            await del(oldFileName, {
+                                token: process.env.BLOB_XX_ABCDEFGHIJKLMNOPQRSTUVWXY_READ_WRITE_TOKEN
+                            });
+                            console.log(`Deleted old photo: ${oldFileName}`);
+                        } catch (deleteError) {
+                            console.warn('Failed to delete previous photo:', deleteError);
+                            // Continue with the update even if deletion fails
+                        }
+                    }
+        
+                    // Update the photo field with the new file URL from Vercel Blob
+                    typeToUpdate.photo = req.fileInfo;
+                
         }
        
         await typeToUpdate.save();
@@ -216,30 +162,23 @@ const UpdateType = async (req, res) => {
         res.status(200).json({
             error: 0,
             data: { id :typeToUpdate._id , 
-                name : typeToUpdate.name ,
-               description : typeToUpdate.description ,
+               name_ar : typeToUpdate.name_ar ,
+               name_en : typeToUpdate.name_en ,
+               description_ar : typeToUpdate.description_ar ,
+               description_en : typeToUpdate.description_en ,
                photo : typeToUpdate.photo
            },
             message: "Type updated successfully."
         });
         
     } catch (error) {
-         // Handle token expiration error
-         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                error: 1,
-                data: [],
-                message: "Token has expired. Please login again.",
-                status: 401
-            });
-        }
-
         // Handle other errors
         console.error(error);
         res.status(500).json({
             error: 1,
             data: [],
-            message: "Server error."
+            message: "Server error.",
+            status : 500
         });
     }
 }
@@ -295,7 +234,8 @@ const GetType = async (req, res) => {
         res.status(500).json({
             error: 1,
             data: [],
-            message: "Server error."
+            message: "Server error.",
+            status: 500
         });
     }
    
