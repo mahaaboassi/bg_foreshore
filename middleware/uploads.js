@@ -11,6 +11,19 @@ const setCategory = (category) => (req, res, next) => {
 
 // Use memory storage to avoid file system writes
 const storage = multer.memoryStorage();
+// Different tokens for different environments
+const getBlobToken = () => {
+    switch(process.env.NODE_ENV) {
+        case 'production':
+            return process.env.PROD_BLOB_TOKEN;
+        case 'development':
+            return process.env.DEV_BLOB_TOKEN;
+        default:
+            return process.env.BLOB_READ_WRITE_TOKEN;
+    }
+   };
+
+
 
 const upload = multer({ 
     storage: storage,
@@ -35,20 +48,21 @@ const uploadToVercelBlob = async (req, res, next) => {
 
     try {
 
-        const token = process.env.BLOB_READ_WRITE_TOKEN;
+        // const token = getBlobToken();
 
-        if (!token) {
-            throw new Error('BLOB_READ_WRITE_TOKEN is not configured.');
-        }
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded' });
-        }
+        // if (!token) {
+        //     throw new Error('BLOB_READ_WRITE_TOKEN is not configured.');
+        // }
+        // if (!req.file) {
+        //     return res.status(400).json({ error: 'No file uploaded' });
+        // }
        
         const category = req.category || 'default';
         const filename = `${category}/${Date.now()}-${req.file.originalname}`;
 
         const blob = await put(filename, req.file.buffer, {
             access: 'public',
+            token : process.env.BLOB_XX_ABCDEFGHIJKLMNOPQRSTUVWXY_READ_WRITE_TOKEN ,
             contentType: req.file.mimetype
         });
 
@@ -61,7 +75,6 @@ const uploadToVercelBlob = async (req, res, next) => {
             
             // Path used for storage reference
             path: filename,
-            
             // Original file details
             originalName: req.file.originalname,
             category: category,
