@@ -13,11 +13,13 @@ const setCategory = (category) => (req, res, next) => {
 var storage = multer.diskStorage({
     destination  : function(req,file,cb){
         const category = req.category || 'default'; // Backend defines the category
-        const uploadDir = path.join(__dirname, `uploads/${category}`);
+        // const uploadDir = path.join(__dirname, `uploads/${category}`);
+        const uploadPath = path.join(process.cwd(), 'uploads', category);
+  
          // Create directory if it doesn't exist
-         fs.mkdirSync(uploadDir, { recursive: true });
+         fs.mkdirSync(uploadPath, { recursive: true });
         
-         cb(null, uploadDir);
+         cb(null, uploadPath);
         // cb(null, `uploads/${category}`); // Set the upload directory
     },
     filename : function(req,file,cb){
