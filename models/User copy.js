@@ -39,25 +39,6 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'user'],  // Only allow these roles
         default: 'user'  // Default role is 'user'
     },
-    gender :{
-        type: String, // Store as a single string
-        enum : ["0","1"],
-        default : "0"
-    },
-    birthday :{ type :String },
-    file :{
-        type: Object,
-        properties: {
-            url: { type: String },        // Vercel Blob public URL
-            path: { type: String },       // Storage path
-            originalName: { type: String },
-            mimeType: { type: String },
-            size: { type: Number }
-        }
-    },
-    active : {  type: String,enum : ["0","1"],default : "0" },
-    country : {type : String },
-    added_by :{type : String, required : true},
     date: { type: Date, default: Date.now },
 })
 
