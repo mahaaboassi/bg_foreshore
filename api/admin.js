@@ -1,9 +1,10 @@
 const express = require("express");
 const { AddType, UpdateType, DeleteType, GetType } = require("../controller/type");
-const { upload , uploadToVercelBlob ,handleFileUploadError, setCategory } = require('../middleware/uploads');
+const { upload , uploadToVercelBlob ,handleFileUploadError, setCategory, uploadMulti, uploadToVercelBlobMulti } = require('../middleware/uploads');
 const { authenticate , authorizeAdmin} = require("../middleware/auth")
 const { Add, Update, Delete, Get, AddSubFeature, UpdateSubFeature, DeleteSubFeature } = require("../controller/feature");
 const { AddUser, UpdateUser, DeleteUser, GetAllUsers, GetOneUser } = require("../controller/user");
+const { AddProperty, GetOneProperty, GetAllProperty, DeleteProperty, UpdateProperty } = require("../controller/property");
 
 
 const adminRouter = express.Router();
@@ -27,6 +28,11 @@ adminRouter.put("/updateUser/:id",setCategory('user'),authenticate,authorizeAdmi
 adminRouter.delete("/deleteUser/:id",  authenticate , authorizeAdmin ,DeleteUser);
 adminRouter.get("/getAllUsers", GetAllUsers);
 adminRouter.get("/getUser/:id", GetOneUser);
-
+// Route to add a new User
+adminRouter.post("/addProperty", setCategory('property'), authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, AddProperty);
+adminRouter.put("/updateProperty/:id",setCategory('property'),authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti,UpdateProperty);
+adminRouter.delete("/deleteProperty/:id",  authenticate , authorizeAdmin ,DeleteProperty);
+adminRouter.get("/getAllProperties", GetAllProperty);
+adminRouter.get("/getProperty/:id", GetOneProperty);
 
 module.exports = {adminRouter};
