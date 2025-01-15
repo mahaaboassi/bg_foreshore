@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div style="margin:auto;width: 400px;color:black; border-radius:12px;background-color: white;border: 1px solid black;">
+        <div style="background: black;border-top-left-radius:12px;border-top-right-radius:12px;padding:10px ; ">
+            <div style="margin: auto;text-align: center;">
+                <img style="height: 100px;" src="https://mahaaboassi.github.io/images/foreshore.png" alt="foreshore-logo" />
+
+            </div>
+            
+        </div>
+        <div style="padding:10px ;">
+            <h1 style="text-align: center;color: #27cbbe;line-height: 3px;">Foreshore</h1>
+            <h4 style="text-align: center ;line-height: 3px;">Holidays Home Rental</h4>
+            <p>Dear Admin</p>
+            <p>A new property listing has been added</p>
+            <div>
+                <h4>Basic Information</h4>
+                <ul>
+                    <li > Name : <span>${data.name}</span></li>
+                    <li > Email : <span>${data.name}</span></li>
+                    <li > Phone : <span>${data.phone_number}</span></li>
+                    <li > Country Code : <span>${data.country_dial}</span></li>
+                    <li > Role User : <span>${data.role}</span></li>
+                </ul>
+                <h4>Property Details</h4>
+                <ul>
+                    <li > Title : <span>${data.title}</span></li>
+                    <li > description : <span>${data.description}</span></li>
+                    <li > Type : <span>${data.type}</span></li>
+                    <li > Number Of Bathroms : <span>${data.bathrooms}</span></li>
+                    <li > Number Of Bedrooms : <span>${data.bedrooms}</span></li>
+                    <li > Number Of Beds : <span>${data.beds}</span></li>
+                    <li > Number Of Guests : <span>${data.guests}</span></li>
+                    <li > Furnishing : <span>${data.furnishing==0?"No":"Yes"}</span></li>
+                    <li > Ready : <span>${data.ready==0?"No":"Yes"}</span></li>
+                </ul>
+                <h4>Location</h4>
+                <ul>
+                    <li > City : <span>${data.city}</span></li>
+                    <li > Region : <span>${data.region}</span></li>
+                    <li > Street : <span>${data.street}</span></li>
+                    <li > Building : <span>${data.building}</span></li>
+                    <li > Floor : <span>${data.floor}</span></li>
+                </ul>
+                <h4>Documents</h4>
+                <ul>
+                    ${
+                        data.files && data.files.length > 0
+                          ? data.files.map(
+                              (file, index) => `
+                                <li >File_${index + 1}: 
+                                  <a href="${file.url}" target="_blank">View File</a>
+                                </li>
+                              `
+                            ).join("")
+                          : "<p>No Document Provided</p>"
+                      }
+                    
+                    
+                </ul>
+
+            </div>
+            <div>
+                <p style="line-height: 1px;">Best regards,</p>
+                <p style="line-height: 2px;"> Foreshore Team</p>
+            </div>
+        </div>
+        <div class="text-align:center">
+            <div style="margin: auto;width: 120px;padding-bottom: 10px;">
+                <a href="https://foreshore.vercel.app/" >
+                    <button style="background-color: #27cbbe;color: white;cursor: pointer;border: none  !important;padding: 10px;border-radius: 12px;">Go To Foreshore</button>
+                </a>
+            </div>
+        </div>
+        
+
+    </div>
+    
+</body>
+</html>
