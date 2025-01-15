@@ -4,7 +4,7 @@ const { upload , uploadToVercelBlob ,handleFileUploadError, setCategory, uploadM
 const { authenticate , authorizeAdmin} = require("../middleware/auth")
 const { Add, Update, Delete, Get, AddSubFeature, UpdateSubFeature, DeleteSubFeature } = require("../controller/feature");
 const { AddUser, UpdateUser, DeleteUser, GetAllUsers, GetOneUser } = require("../controller/user");
-// const { AddProperty, GetOneProperty, GetAllProperty, DeleteProperty, UpdateProperty } = require("../controller/property");
+const { AddProperty, GetOneProperty, GetAllProperty, DeleteProperty, UpdateProperty } = require("../controller/property");
 const { SendList } = require("../controller/sendProperty");
 
 
@@ -30,11 +30,11 @@ adminRouter.delete("/deleteUser/:id",  authenticate , authorizeAdmin ,DeleteUser
 adminRouter.get("/getAllUsers", GetAllUsers);
 adminRouter.get("/getUser/:id", GetOneUser);
 // // Route to add a new User
-// adminRouter.post("/addProperty", setCategory('property'), authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, AddProperty);
-// adminRouter.put("/updateProperty/:id",setCategory('property'),authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti,UpdateProperty);
-// adminRouter.delete("/deleteProperty/:id",  authenticate , authorizeAdmin ,DeleteProperty);
-// adminRouter.get("/getAllProperties", GetAllProperty);
-// adminRouter.get("/getProperty/:id", GetOneProperty);
+adminRouter.post("/addProperty", setCategory('property'), authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, AddProperty);
+adminRouter.put("/updateProperty/:id",setCategory('property'),authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti,UpdateProperty);
+adminRouter.delete("/deleteProperty/:id",  authenticate , authorizeAdmin ,DeleteProperty);
+adminRouter.get("/getAllProperties", GetAllProperty);
+adminRouter.get("/getProperty/:id", GetOneProperty);
 
 // // List Property 
 adminRouter.post("/list", setCategory('list'),uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, SendList);
