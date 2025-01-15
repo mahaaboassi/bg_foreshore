@@ -1,5 +1,5 @@
 const feature = require("../models/feature");
-const property = require("../models/property");
+const property  = require("../models/Property")
 
 
 const AddProperty = async (req,res)=>{
