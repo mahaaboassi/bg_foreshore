@@ -4,8 +4,8 @@ const { upload , uploadToVercelBlob ,handleFileUploadError, setCategory, uploadM
 const { authenticate , authorizeAdmin} = require("../middleware/auth")
 const { Add, Update, Delete, Get, AddSubFeature, UpdateSubFeature, DeleteSubFeature } = require("../controller/feature");
 const { AddUser, UpdateUser, DeleteUser, GetAllUsers, GetOneUser } = require("../controller/user");
-const { AddProperty, GetOneProperty, GetAllProperty, DeleteProperty, UpdateProperty } = require("../controller/property");
-const { SendList } = require("../controller/sendProperty");
+// const { AddProperty, GetOneProperty, GetAllProperty, DeleteProperty, UpdateProperty } = require("../controller/property");
+// const { SendList } = require("../controller/sendProperty");
 
 
 const adminRouter = express.Router();
