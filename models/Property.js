@@ -73,4 +73,4 @@ const propertySchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
 })
 
-module.exports = mongoose.model("Properties",propertySchema)
+module.exports = mongoose.model("Property",propertySchema)
