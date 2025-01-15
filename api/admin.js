@@ -37,6 +37,6 @@ adminRouter.get("/getAllProperties", GetAllProperty);
 adminRouter.get("/getProperty/:id", GetOneProperty);
 
 // List Property 
-// adminRouter.post("/list", setCategory('list'),uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, SendList);
+adminRouter.post("/list", setCategory('list'),uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, SendList);
 
 module.exports = {adminRouter};
