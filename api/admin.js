@@ -29,14 +29,14 @@ adminRouter.put("/updateUser/:id",setCategory('user'),authenticate,authorizeAdmi
 adminRouter.delete("/deleteUser/:id",  authenticate , authorizeAdmin ,DeleteUser);
 adminRouter.get("/getAllUsers", GetAllUsers);
 adminRouter.get("/getUser/:id", GetOneUser);
-// Route to add a new User
-adminRouter.post("/addProperty", setCategory('property'), authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, AddProperty);
-adminRouter.put("/updateProperty/:id",setCategory('property'),authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti,UpdateProperty);
-adminRouter.delete("/deleteProperty/:id",  authenticate , authorizeAdmin ,DeleteProperty);
-adminRouter.get("/getAllProperties", GetAllProperty);
-adminRouter.get("/getProperty/:id", GetOneProperty);
+// // Route to add a new User
+// adminRouter.post("/addProperty", setCategory('property'), authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, AddProperty);
+// adminRouter.put("/updateProperty/:id",setCategory('property'),authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti,UpdateProperty);
+// adminRouter.delete("/deleteProperty/:id",  authenticate , authorizeAdmin ,DeleteProperty);
+// adminRouter.get("/getAllProperties", GetAllProperty);
+// adminRouter.get("/getProperty/:id", GetOneProperty);
 
-// List Property 
-adminRouter.post("/list", setCategory('list'),uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, SendList);
+// // List Property 
+// adminRouter.post("/list", setCategory('list'),uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, SendList);
 
 module.exports = {adminRouter};
