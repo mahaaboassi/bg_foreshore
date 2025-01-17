@@ -62,22 +62,22 @@ const sendEmail = async (data) => {
             </div>
             
         </div>
-        <div style="padding:10px ;">
+        <div style="padding:10px ;color:black">
             <h1 style="text-align: center;color: #27cbbe;line-height: 3px;">Foreshore</h1>
-            <h4 style="text-align: center ;line-height: 3px;">Holidays Home Rental</h4>
+            <h4 style="text-align: center;color:black ;line-height: 3px;">Holidays Home Rental</h4>
             <p>Dear Admin</p>
             <p >A new property listing has been added</p>
             <div>
-                <h4>Basic Information</h4>
-                <ul>
+                <h4 style="color:black" >Basic Information</h4>
+                <ul style="color:black">
                     <li > Name : <span>${data.name}</span></li>
                     <li > Email : <span>${data.email}</span></li>
                     <li > Phone : <span>${data.phone_number}</span></li>
                     <li > Country Code : <span>${data.country_dial}</span></li>
                     <li > Role User : <span>${data.role}</span></li>
                 </ul>
-                <h4>Property Details</h4>
-                <ul>
+                <h4 style="color:black">Property Details</h4>
+                <ul style="color:black">
                     <li > Title : <span>${data.title}</span></li>
                     <li > description : <span>${data.description}</span></li>
                     <li > Type : <span>${data.type}</span></li>
@@ -88,15 +88,15 @@ const sendEmail = async (data) => {
                     <li > Furnishing : <span>${data.furnishing==0?"No":"Yes"}</span></li>
                     <li > Ready : <span>${data.ready==0?"No":"Yes"}</span></li>
                 </ul>
-                <h4>Location</h4>
-                <ul>
+                <h4 style="color:black">Location</h4>
+                <ul style="color:black">
                     <li > City : <span>${data.city}</span></li>
                     <li > Region : <span>${data.region}</span></li>
                     <li > Street : <span>${data.street}</span></li>
                     <li > Building : <span>${data.building}</span></li>
                     <li > Floor : <span>${data.floor}</span></li>
                 </ul>
-                <h4>Documents</h4>
+                <h4 style="color:black">Documents</h4>
                 <ul>
                     ${
                         data.files && data.files.length > 0
