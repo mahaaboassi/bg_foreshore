@@ -254,7 +254,7 @@ const SendList = async (req,res)=>{
             res.status(200).json({
                 error : 0,
                 data : propertySave,
-                message : "Property added successfully, and emails sent!"
+                message : "Property sent successfully.Thanks for trusting us."
             });
     } catch (error) {
     // Handle other errors
