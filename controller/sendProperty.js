@@ -29,12 +29,12 @@ const sendEmail = async (data) => {
         </div>
         <div style="padding:10px ;">
             <h1 style="text-align: center;color: #27cbbe;line-height: 3px;">Welcome To Foreshore</h1>
-            <h4 style="text-align: center ;line-height: 3px;">Holidays Home Rental</h4>
-            <p>Dear ${data.name}</p>
-            <p >Thank you for listing your property with us. We are reviewing your details and will get back to you shortly.</p>
-            <div>
-                <p style="line-height: 1px;">Best regards,</p>
-                <p style="line-height: 2px;"> Foreshore Team</p>
+            <h4 style="text-align: center;color:black; ;line-height: 3px;">Holidays Home Rental</h4>
+            <p style="color:black">Dear ${data.name}</p>
+            <p style="color:black">Thank you for listing your property with us. We are reviewing your details and will get back to you shortly.</p>
+            <div style="color:black">
+                <p style="line-height: 1px;color:black">Best regards,</p>
+                <p style="line-height: 2px;color:black"> Foreshore Team</p>
             </div>
         </div>
         <div class="text-align:center">
@@ -54,80 +54,76 @@ const sendEmail = async (data) => {
         from: "eng.mahaab96@gmail.com", // Replace with your email
         to: "globalariz30@gmail.com", // Replace with admin's email
         subject: "New Property Listing",
-        html: `<div style="margin:auto;width: 500px;color:black; border-radius:12px;background-color: white;border: 1px solid black;">
-        <div style="background: black;border-top-left-radius:12px;border-top-right-radius:12px;padding:10px ; ">
+        html:  `<div style="margin:auto;width: 500px;color:black; border-radius:12px;background-color: white;border: 1px solid black;">
+        <div style="background: black;border-top-left-radius:12px;border-top-right-radius:12px;padding:10px;">
             <div style="margin: auto;text-align: center;">
                 <img style="height: 100px;" src="https://mahaaboassi.github.io/images/foreshore.png" alt="foreshore-logo" />
-
             </div>
-            
         </div>
-        <div style="padding:10px ;color:black">
+        <div style="padding:10px;color:black;">
             <h1 style="text-align: center;color: #27cbbe;line-height: 3px;">Foreshore</h1>
-            <h4 style="text-align: center;color:black ;line-height: 3px;">Holidays Home Rental</h4>
-            <p>Dear Admin</p>
-            <p >A new property listing has been added</p>
+            <h4 style="text-align: center;color:black;line-height: 3px;">Holidays Home Rental</h4>
+            <p style="color:black;">Dear Admin</p>
+            <p style="color:black;">A new property listing has been added</p>
             <div>
-                <h4 style="color:black" >Basic Information</h4>
-                <ul style="color:black">
-                    <li > Name : <span>${data.name}</span></li>
-                    <li > Email : <span>${data.email}</span></li>
-                    <li > Phone : <span>${data.phone_number}</span></li>
-                    <li > Country Code : <span>${data.country_dial}</span></li>
-                    <li > Role User : <span>${data.role}</span></li>
+                <h4 style="color:black;">Basic Information</h4>
+                <ul style="color:black;">
+                    <li style="color:black;">Name: <span>${data.name}</span></li>
+                    <li style="color:black;">Email: <span>${data.email}</span></li>
+                    <li style="color:black;">Phone: <span>${data.phone_number}</span></li>
+                    <li style="color:black;">Country Code: <span>${data.country_dial}</span></li>
+                    <li style="color:black;">Role User: <span>${data.role}</span></li>
                 </ul>
-                <h4 style="color:black">Property Details</h4>
-                <ul style="color:black">
-                    <li > Title : <span>${data.title}</span></li>
-                    <li > description : <span>${data.description}</span></li>
-                    <li > Type : <span>${data.type}</span></li>
-                    <li > Number Of Bathroms : <span>${data.bathrooms}</span></li>
-                    <li > Number Of Bedrooms : <span>${data.bedrooms}</span></li>
-                    <li > Number Of Beds : <span>${data.beds}</span></li>
-                    <li > Number Of Guests : <span>${data.guests}</span></li>
-                    <li > Furnishing : <span>${data.furnishing==0?"No":"Yes"}</span></li>
-                    <li > Ready : <span>${data.ready==0?"No":"Yes"}</span></li>
+                <h4 style="color:black;">Property Details</h4>
+                <ul style="color:black;">
+                    <li style="color:black;">Title: <span>${data.title}</span></li>
+                    <li style="color:black;">Description: <span>${data.description}</span></li>
+                    <li style="color:black;">Type: <span>${data.type}</span></li>
+                    <li style="color:black;">Number Of Bathrooms: <span>${data.bathrooms}</span></li>
+                    <li style="color:black;">Number Of Bedrooms: <span>${data.bedrooms}</span></li>
+                    <li style="color:black;">Number Of Beds: <span>${data.beds}</span></li>
+                    <li style="color:black;">Number Of Guests: <span>${data.guests}</span></li>
+                    <li style="color:black;">Furnishing: <span>${data.furnishing == 0 ? "No" : "Yes"}</span></li>
+                    <li style="color:black;">Ready: <span>${data.ready == 0 ? "No" : "Yes"}</span></li>
                 </ul>
-                <h4 style="color:black">Location</h4>
-                <ul style="color:black">
-                    <li > City : <span>${data.city}</span></li>
-                    <li > Region : <span>${data.region}</span></li>
-                    <li > Street : <span>${data.street}</span></li>
-                    <li > Building : <span>${data.building}</span></li>
-                    <li > Floor : <span>${data.floor}</span></li>
+                <h4 style="color:black;">Location</h4>
+                <ul style="color:black;">
+                    <li style="color:black;">City: <span>${data.city}</span></li>
+                    <li style="color:black;">Region: <span>${data.region}</span></li>
+                    <li style="color:black;">Street: <span>${data.street}</span></li>
+                    <li style="color:black;">Building: <span>${data.building}</span></li>
+                    <li style="color:black;">Floor: <span>${data.floor}</span></li>
                 </ul>
-                <h4 style="color:black">Documents</h4>
-                <ul>
+                <h4 style="color:black;">Documents</h4>
+                <ul style="color:black;">
                     ${
-                        data.files && data.files.length > 0
-                            ? data.files.map(
-                                (file, index) => `
-                                <li >File_${index + 1}: 
-                                    <a href="${file.url}" target="_blank">View File</a>
-                                </li>
-                                `
-                            ).join("")
-                            : "<p>No Document Provided</p>"
-                        }
-                    
+                      data.files && data.files.length > 0
+                        ? data.files
+                            .map(
+                              (file, index) => `
+                              <li style="color:black;">File_${index + 1}: 
+                                  <a href="${file.url}" target="_blank" style="color:#27cbbe;">View File</a>
+                              </li>
+                              `
+                            )
+                            .join("")
+                        : "<p style='color:black;'>No Document Provided</p>"
+                    }
                 </ul>
-
             </div>
             <div>
-                <p style="line-height: 1px;">Best regards,</p>
-                <p style="line-height: 2px;"> Foreshore Team</p>
+                <p style="color:black;line-height: 1px;">Best regards,</p>
+                <p style="color:black;line-height: 2px;">Foreshore Team</p>
             </div>
         </div>
-        <div class="text-align:center">
+        <div style="text-align:center;">
             <div style="margin: auto;width: 120px;padding-bottom: 10px;">
-                <a href="https://foreshore.vercel.app/" >
-                    <button style="background-color: #27cbbe;cursor: pointer;color: white;border: none  !important;padding: 10px;border-radius: 12px;">Go To Foreshore</button>
+                <a href="https://foreshore.vercel.app/" style="text-decoration:none;">
+                    <button style="background-color: #27cbbe;cursor: pointer;color: white;border: none;padding: 10px;border-radius: 12px;">Go To Foreshore</button>
                 </a>
             </div>
         </div>
-        
-
-    </div>`
+      </div>`
       };
   
       // Send Emails
