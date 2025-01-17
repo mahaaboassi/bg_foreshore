@@ -19,7 +19,7 @@ const sendEmail = async (data) => {
         to: data.email,
         subject: "Confirmation: Property Listing Received",
         // text: `Dear ,\n\nThank you for listing your property with us. We are reviewing your details and will get back to you shortly.\n\nBest regards,\nYour Team`,
-        html : `<div style="margin:auto;width: 400px;color:black; border-radius:12px;background-color: white;border: 1px solid black;">
+        html : `<div style="margin:auto;width: 500px; border-radius:12px;background-color: white;border: 1px solid black;">
         <div style="background: black;border-top-left-radius:12px;border-top-right-radius:12px;padding:10px ; ">
             <div style="margin: auto;text-align: center;">
                 <img style="height: 100px;" src="https://mahaaboassi.github.io/images/foreshore.png" alt="foreshore-logo" />
@@ -54,7 +54,7 @@ const sendEmail = async (data) => {
         from: "eng.mahaab96@gmail.com", // Replace with your email
         to: "globalariz30@gmail.com", // Replace with admin's email
         subject: "New Property Listing",
-        html: `<div style="margin:auto;width: 400px;color:black; border-radius:12px;background-color: white;border: 1px solid black;">
+        html: `<div style="margin:auto;width: 500px ; border-radius:12px;background-color: white;border: 1px solid black;">
         <div style="background: black;border-top-left-radius:12px;border-top-right-radius:12px;padding:10px ; ">
             <div style="margin: auto;text-align: center;">
                 <img style="height: 100px;" src="https://mahaaboassi.github.io/images/foreshore.png" alt="foreshore-logo" />
