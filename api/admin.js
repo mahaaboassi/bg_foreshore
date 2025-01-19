@@ -2,7 +2,7 @@ const express = require("express");
 const { AddType, UpdateType, DeleteType, GetType } = require("../controller/type");
 const { upload , uploadToVercelBlob ,handleFileUploadError, setCategory, uploadMulti, uploadToVercelBlobMulti } = require('../middleware/uploads');
 const { authenticate , authorizeAdmin} = require("../middleware/auth")
-const { Add, Update, Delete, Get, AddSubFeature, UpdateSubFeature, DeleteSubFeature } = require("../controller/feature");
+const { Add, Update, Delete, Get, AddSubFeature, UpdateSubFeature, DeleteSubFeature, GetAllSubFeatures } = require("../controller/feature");
 const { AddUser, UpdateUser, DeleteUser, GetAllUsers, GetOneUser } = require("../controller/user");
 const { AddProperty, GetOneProperty, GetAllProperty, DeleteProperty, UpdateProperty } = require("../controller/property");
 const { SendList } = require("../controller/sendProperty");
@@ -23,6 +23,7 @@ adminRouter.get("/getAllFeatures", Get);
 adminRouter.post("/addSubFeature", setCategory('feature'), authenticate,authorizeAdmin,upload.single("photo"),handleFileUploadError,uploadToVercelBlob, AddSubFeature);
 adminRouter.put("/updateSubFeature/:id",setCategory('feature'), authenticate,authorizeAdmin,upload.single("photo"),handleFileUploadError,uploadToVercelBlob, UpdateSubFeature);
 adminRouter.delete("/deleteSubFeature/:id",authenticate,authorizeAdmin, DeleteSubFeature);
+adminRouter.get("/getAllSubFeatures", GetAllSubFeatures);
 // Route to add a new User
 adminRouter.post("/addUser", setCategory('user'), authenticate,authorizeAdmin,upload.single("file"),handleFileUploadError,uploadToVercelBlob, AddUser);
 adminRouter.put("/updateUser/:id",setCategory('user'),authenticate,authorizeAdmin,upload.single("file"),handleFileUploadError,uploadToVercelBlob,UpdateUser);

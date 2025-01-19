@@ -29,7 +29,7 @@ const typeSchema = new mongoose.Schema({
             size: { type: Number }
         }
     },
-    added_by :{type : String, required : true},
+    added_by :{type : Object, required : true},
     date: { type: Date, default: Date.now },
 })
 

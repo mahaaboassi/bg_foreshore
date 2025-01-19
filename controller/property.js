@@ -1,5 +1,6 @@
 const feature = require("../models/feature");
-const property  = require("../models/Property")
+const property  = require("../models/Property");
+const Type = require("../models/Type");
 const User = require("../models/User")
 
 const AddProperty = async (req,res)=>{
@@ -23,7 +24,10 @@ const AddProperty = async (req,res)=>{
                   status : 400
                 });
               }
-            if (!type ) {
+              console.log(type);
+              
+            const typeExist = await Type.findById(type)
+            if (!typeExist ) {
                 return res.status(400).json({
                   error: 1,
                   data : [],
@@ -59,14 +63,7 @@ const AddProperty = async (req,res)=>{
                   status : 400
                 });
               }
-              if (!owner) {
-                return res.status(400).json({
-                  error: 1,
-                  data : [],
-                  message: "Owner field is required.",
-                  status : 400
-                });
-              }
+             
                 const user = await User.findById(req.user.id)
                 if(!user){
                     return res.status(400).json({
@@ -76,6 +73,15 @@ const AddProperty = async (req,res)=>{
                         status : 400
                         });
                 }
+                const ownerExist = await User.findById(owner)
+                if (!ownerExist) {
+                    return res.status(400).json({
+                      error: 1,
+                      data : [],
+                      message: "Owner field is required.",
+                      status : 400
+                    });
+                  }
               const data = {
                 name_ar,
                 name_en,
@@ -91,14 +97,26 @@ const AddProperty = async (req,res)=>{
                 beds: parseInt(beds),
                 guests: parseInt(guests),
                 city,
-                type,
+                type:{
+                    _id :typeExist._id,
+                    name_en : typeExist.name_en,
+                    name_ar : typeExist.name_ar,
+                    description_en : typeExist.description_en,
+                    description_ar : typeExist.description_ar
+                },
                 region,
                 street,
                 building,
                 floor,
+                link_map,
                 furnishing,
+                registration_number,
                 ready,
-                owner,
+                owner:{
+                    id : ownerExist._id,
+                    name  : ownerExist.name,
+                    email : ownerExist.email,
+                },
               };
             const featuresArray = []
             for (const element of features || []) {

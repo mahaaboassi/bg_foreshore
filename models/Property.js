@@ -52,14 +52,14 @@ const propertySchema = new mongoose.Schema({
     description_ar : { type : String },
     description_en : { type : String },
     features :{  type : [featureSchema],default: [] },
-    type : { type : String, required : true},
+    type : { type : Object, required : true},
     files: {
         type: [fileSchema], // Array of file objects
         default: [],        // Default to an empty array
       },
     furnishing : {  type: String,enum : ["0","1"],default : "0" },
     ready : {  type: String,enum : ["0","1"],default : "0" },
-    owner : {type: String,required : true},
+    owner : {type: Object,required : true},
     bathrooms : {type : Number,required : true },
     bedrooms : { type : Number, required : true},
     beds : { type : Number, required : true},

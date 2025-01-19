@@ -1,4 +1,5 @@
 const type = require("../models/Type");
+const User = require("../models/User")
 const { del } = require('@vercel/blob');
 
 
@@ -13,24 +14,37 @@ const AddType = async (req, res) => {
             status : 400
           });
         }
+        const user = await User.findById(req.user.id)
+        if(!user){
+            return res.status(400).json({
+                error: 1,
+                data : [],
+                message: "User not found.",
+                status : 400
+                });
+        }
 
         const data = {
             name_ar : name_ar,
             name_en : name_en,
-            added_by : req.user.id,
+            added_by: {
+                id : user._id,
+                name  : user.name,
+                email : user.email,
+            },
             description_en : description_en || "",
             description_ar : description_ar || "",  // If description is provided, use it; otherwise, set it to an empty string.
         };
 
-        if (!req.file) {
-            return res.status(500).json({
-                        error: 1,
-                        data: [],
-                        message: 'No file provided for upload.', 
-                        status: 400
-                    });
-          }
-        data.photo = req.fileInfo;
+        // if (!req.file) {
+        //     return res.status(500).json({
+        //                 error: 1,
+        //                 data: [],
+        //                 message: 'No file provided for upload.', 
+        //                 status: 400
+        //             });
+        //   }
+        data.photo = req.fileInfo || "";
         const typeSave = new type(data);
         await typeSave.save();
 

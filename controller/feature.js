@@ -607,11 +607,86 @@ const DeleteSubFeature = async (req, res) => {
         });
       }
 }
+const GetAllSubFeatures = async (req, res) => {
+    try {
+        // Extract page and limit from query parameters
+        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+        const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
+        const skip = (page - 1) * limit; // Calculate number of items to skip
+
+        // Fetch all features
+        const features = await feature.find();
+
+        // If no features found, return empty response
+        if (!features || features.length === 0) {
+            return res.status(404).json({
+                error: 1,
+                data: [],
+                message: "No Features found.",
+                status: 404
+            });
+        }
+
+        // Extract sub-features from features
+        let allSubFeatures = features.flatMap(ele => 
+            ele.subFeatures.map(subEle => ({
+                name_ar: subEle.name_ar,
+                name_en: subEle.name_en,
+                description_ar: subEle.description_ar,
+                description_en: subEle.description_en,
+                icon: subEle.icon,
+                added_by: subEle.added_by,
+                _id: subEle._id,
+                date: subEle.date,
+                parent: {
+                    name_ar: ele.name_ar,
+                    name_en: ele.name_en,
+                    description_ar: ele.description_ar,
+                    description_en: ele.description_en,
+                    photo: ele.photo,
+                    added_by: ele.added_by,
+                    _id: ele._id,
+                }
+            }))
+        );
+
+        // Get total number of sub-features for pagination
+        const totalItems = allSubFeatures.length;
+        const allPages = Math.ceil(totalItems / limit);
+
+        // Apply pagination on sub-features
+        const paginatedSubFeatures = allSubFeatures.slice(skip, skip + limit);
+
+        // Return paginated sub-features with metadata
+        res.status(200).json({
+            error: 0,
+            data: paginatedSubFeatures,
+            message: "Sub Features fetched successfully.",
+            meta: {
+                current_page: page,
+                total: totalItems,
+                per_page: limit,
+                all_pages: allPages,
+                last_page: allPages || 1, // Ensure last_page is at least 1
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: 1,
+            data: [],
+            message: "Server error."
+        });
+    }
+   
+}
 module.exports = {
     Add,
     Delete,
     Update,
     Get,
+    GetAllSubFeatures,
     AddSubFeature,
     UpdateSubFeature,
     DeleteSubFeature

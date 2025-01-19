@@ -17,16 +17,6 @@ const subFeatureSchema = new mongoose.Schema({
     },
     description_ar : {type : String},
     description_en : {type : String},
-    // photo : {
-    //     type : Object,
-    //     properties: {
-    //         url: { type: String },        // Vercel Blob public URL
-    //         path: { type: String },       // Storage path
-    //         originalName: { type: String },
-    //         mimeType: { type: String },
-    //         size: { type: Number }
-    //     }
-    // },
     icon : {type: Buffer , requried: true},
     added_by :{type : Object, required : true},
     date: { type: Date, default: Date.now },
