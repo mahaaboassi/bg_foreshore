@@ -513,7 +513,6 @@ const GetOneProperty = async (req, res) => {
             error: 0,
             data: existingProperty,
             message: "Property fetched successfully.",
-            meta: existingUser,
         });
 
     } catch (error) {
