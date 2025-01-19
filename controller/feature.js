@@ -1,4 +1,5 @@
 const feature = require("../models/feature");
+const User = require("../models/User")
 const { del } = require('@vercel/blob');
 
 
@@ -15,23 +16,35 @@ const Add = async (req, res) => {
             status : 400
           });
         }
-
+        const user = await User.findById(req.user.id)
+        if(!user){
+            return res.status(400).json({
+                error: 1,
+                data : [],
+                message: "User not found.",
+                status : 400
+              });
+        }
         const data = {
             name_ar : name_ar,
             name_en : name_en,
-            added_by : req.user.id,
+            added_by : {
+                id : user._id,
+                name  : user.name,
+                email : user.email,
+            },
             description_en : description_en || "",
             description_ar : description_ar || "",  // If description is provided, use it; otherwise, set it to an empty string.
         };
-        if (!req.file) {
-            return res.status(500).json({
-                        error: 1,
-                        data: [],
-                        message: 'No file provided for upload.', 
-                        status: 400
-                    });
-          }
-        data.photo = req.fileInfo;
+        // if (!req.file) {
+        //     return res.status(500).json({
+        //                 error: 1,
+        //                 data: [],
+        //                 message: 'No file provided for upload.', 
+        //                 status: 400
+        //             });
+        //   }
+        data.photo = req.fileInfo || "";
         const featureSave = new feature(data);
         await featureSave.save();
 
@@ -287,7 +300,7 @@ const Get = async (req, res) => {
 }
 // Sub Feature
 const AddSubFeature = async (req, res) => {
-    const {name_ar, name_en , description_ar , description_en  ,id_feature } = req.body
+    const {name_ar, name_en , description_ar , description_en  ,id_feature , icon} = req.body
 
        
     try {
@@ -317,23 +330,45 @@ const AddSubFeature = async (req, res) => {
             status : 400
           });
         }
+        if (!icon  ) {
+            return res.status(400).json({
+              error: 1,
+              data : [],
+              message: "Icon field is required.",
+              status : 400
+            });
+          }
+        const user = await User.findById(req.user.id)
+        if(!user){
+            return res.status(400).json({
+                error: 1,
+                data : [],
+                message: "User not found.",
+                status : 400
+              });
+        }
         const subFeatureData = {
             name_en : name_en,
             name_ar : name_ar,
-            added_by : req.user.id,
+            added_by :  {
+                id : user._id,
+                name  : user.name,
+                email : user.email,
+            },
+            icon : icon,
             description_ar : description_ar || "",
             description_en : description_en || "",  // If description is provided, use it; otherwise, set it to an empty string.
         };
-        if (!req.file) {
-            return res.status(500).json({
-                        error: 1,
-                        data: [],
-                        message: 'No file provided for upload.',
-                        status: 400
-                    });
-          }
+        // if (!req.file) {
+        //     return res.status(500).json({
+        //                 error: 1,
+        //                 data: [],
+        //                 message: 'No file provided for upload.',
+        //                 status: 400
+        //             });
+        //   }
         // Handle the file upload if a file is uploaded
-        subFeatureData.photo = req.fileInfo; 
+        // subFeatureData.photo = req.fileInfo; 
         rootFeature.subFeatures.push(subFeatureData);  // Add the sub-feature to the feature
         await rootFeature.save();  // Save the updated feature
         res.status(200).json({
@@ -344,7 +379,7 @@ const AddSubFeature = async (req, res) => {
                 name_en : subFeatureData.name_en,
                 description_ar : subFeatureData.description_ar,
                 description_en : subFeatureData.description_en,
-                photo: subFeatureData.photo ,
+                icon: subFeatureData.icon ,
                 root_feature :{
                     id: rootFeature._id,  // ID of the root feature
                     name_ar : rootFeature.name_ar,

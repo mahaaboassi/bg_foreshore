@@ -69,7 +69,9 @@ const propertySchema = new mongoose.Schema({
     street : {type : String, required : true},
     building : {type : String, required : true},
     floor : {type : String, required : true},
-    added_by :{type : String, required : true},
+    added_by :{type : Object, required : true},
+    registration_number : {type : String, required : true},
+    link_map : {type : String, required : true},
     date: { type: Date, default: Date.now },
 })
 

@@ -1,10 +1,10 @@
 const feature = require("../models/feature");
 const property  = require("../models/Property")
-
+const User = require("../models/User")
 
 const AddProperty = async (req,res)=>{
     const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing , ready , owner ,
-         bathrooms ,bedrooms , beds , guests , city , region, street, building , floor  } = req.body
+         bathrooms,link_map ,bedrooms,registration_number , beds , guests , city , region, street, building , floor  } = req.body
 
      try {
             if (!name_ar || !name_en) {
@@ -15,6 +15,14 @@ const AddProperty = async (req,res)=>{
                 status : 400
               });
             }
+            if (!registration_number) {
+                return res.status(400).json({
+                  error: 1,
+                  data : [],
+                  message: "Registration Number field is required.",
+                  status : 400
+                });
+              }
             if (!type ) {
                 return res.status(400).json({
                   error: 1,
@@ -43,11 +51,11 @@ const AddProperty = async (req,res)=>{
                   status: 400,
                 });
               }
-              if (!city || !region || !street || !building || !floor) {
+              if (!city || !region || !street || !building || !floor || !link_map) {
                 return res.status(400).json({
                   error: 1,
                   data : [],
-                  message: "( City, Region, Street, Building, and Floor) fields are required.",
+                  message: "( City, Region, Street, Building, Floor, and Link Map) fields are required.",
                   status : 400
                 });
               }
@@ -59,11 +67,23 @@ const AddProperty = async (req,res)=>{
                   status : 400
                 });
               }
-            
+                const user = await User.findById(req.user.id)
+                if(!user){
+                    return res.status(400).json({
+                        error: 1,
+                        data : [],
+                        message: "User not found.",
+                        status : 400
+                        });
+                }
               const data = {
                 name_ar,
                 name_en,
-                added_by: req.user.id,
+                added_by: {
+                    id : user._id,
+                    name  : user.name,
+                    email : user.email,
+                },
                 description_ar: description_ar || "",
                 description_en: description_en || "",
                 bathrooms: parseInt(bathrooms),

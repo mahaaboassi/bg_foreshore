@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema({
     },
     active : {  type: String,enum : ["0","1"],default : "0" },
     country : {type : String },
-    added_by :{type : String, required : true},
+    added_by :{type : String},
     date: { type: Date, default: Date.now },
 })
 
