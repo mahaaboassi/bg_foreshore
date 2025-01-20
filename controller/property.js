@@ -146,7 +146,7 @@ const AddProperty = async (req,res)=>{
                         id : subFeatureExist._id,
                         name_ar : subFeatureExist.name_ar,
                         name_en : subFeatureExist.name_en,
-                        file : subFeatureExist.photo,
+                        icon : subFeatureExist.icon,
                     })
                 }
                 featuresArray.push({
