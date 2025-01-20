@@ -13,21 +13,13 @@ const subFeatureSchema = new mongoose.Schema({
     id: { type: String, required: true }, // Root feature ID
     name_ar : { type :String},
     name_en : { type :String},
-    file : { type :Object,
-            properties: {
-                url: { type: String },        // Vercel Blob public URL
-                path: { type: String },       // Storage path
-                originalName: { type: String },
-                mimeType: { type: String },
-                size: { type: Number }
-            }
-    }
+    icon : { type : Buffer }
     });
 const featureSchema = new mongoose.Schema({
     id : { type: String, required: true }, // Root feature ID
     name_ar : { type :String},
     name_en : { type :String},
-    file : { type :Object,
+    icon : { type :Object,
         properties: {
             url: { type: String },        // Vercel Blob public URL
             path: { type: String },       // Storage path

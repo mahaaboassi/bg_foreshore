@@ -3,6 +3,7 @@ const property  = require("../models/Property");
 const Type = require("../models/Type");
 const User = require("../models/User")
 
+
 const AddProperty = async (req,res)=>{
     const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing , ready , owner ,
          bathrooms,link_map ,bedrooms,registration_number , beds , guests , city , region, street, building , floor  } = req.body
@@ -24,7 +25,6 @@ const AddProperty = async (req,res)=>{
                   status : 400
                 });
               }
-              console.log(type);
               
             const typeExist = await Type.findById(type)
             if (!typeExist ) {
@@ -122,7 +122,6 @@ const AddProperty = async (req,res)=>{
             for (const element of features || []) {
 
                 const featureRootExist = await feature.findById(element.id)
-                
                 if(!featureRootExist){
                     return res.status(400).json({
                         error: 1,
@@ -134,6 +133,8 @@ const AddProperty = async (req,res)=>{
                 let children  = []
                 for (const child of element.subFeatures || []) {
                     const subFeatureExist = featureRootExist.subFeatures.find(e=> e._id.toString() == child.toString())
+                   
+                    
                     if(!subFeatureExist){
                         return res.status(400).json({
                             error: 1,
