@@ -38,7 +38,7 @@ const uploadMulti = multer({
     limits: {
         fileSize: 5 * 1024 * 1024 // 5MB file size limit
     }
-}).array("files",10);
+}).array("files",20);
 
 // Middleware to upload to Vercel Blob
 const uploadToVercelBlob = async (req, res, next) => {
