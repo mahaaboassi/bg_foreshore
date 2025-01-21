@@ -427,50 +427,63 @@ const DeleteProperty = async (req, res) => {
 
 }
 
+
 const GetAllProperty = async (req, res) => {
     try {
-         // Extract page and limit from query parameters
-         const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-         const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
- 
-         // Calculate the number of items to skip
-         const skip = (page - 1) * limit;
-       
-         // Fetch types with pagination
-         const data = await property.find()
-             .skip(skip)
-             .limit(limit);
- 
-         // Get total number of items for metadata
-         const totalItems = await property.countDocuments();
- 
-         // Calculate total pages
-         const allPages = Math.ceil(totalItems / limit);
-        // Get the last page
-        const lastPage = allPages > 0 ? allPages : 1; // Set lastPage to 1 if there are no types
+        // Extract query parameters
+        const { page = 1, limit = 10, city, guests, type } = req.query;
 
-        // Fetch all types from the database
+        // Convert page and limit to numbers
+        const pageNumber = parseInt(page) || 1;
+        const limitNumber = parseInt(limit) || 10;
+
+        // Calculate the number of items to skip
+        const skip = (pageNumber - 1) * limitNumber;
+
+        // Build search query
+        let query = {};
+
+        if (city) query.city = { $regex: city, $options: "i" }; // Case-insensitive city search
+        if (guests) query.guests = parseInt(guests); // Match exact number of guests
+        if (type) {
+            query["$or"] = [
+                { "type.name_en": { $regex: type, $options: "i" } }, // Search in English
+                { "type.name_ar": { $regex: type, $options: "i" } }  // Search in Arabic
+            ];
+        }
+        // Fetch properties with filters and pagination
+        const data = await property.find(query)
+            .skip(skip)
+            .limit(limitNumber);
+
+        // Get total number of items for metadata
+        const totalItems = await property.countDocuments(query);
+
+        // Calculate total pages
+        const allPages = Math.ceil(totalItems / limitNumber);
+        const lastPage = allPages > 0 ? allPages : 1;
+
+        // Check if data exists
         if (!data || data.length === 0) {
             return res.status(404).json({
                 error: 1,
                 data: [],
-                message: "No Property found.",
+                message: "No properties found.",
                 status: 404
             });
         }
 
-        // Respond with the fetched types
-         // Return the data with metadata
-         res.status(200).json({
+        // Respond with the fetched properties
+        res.status(200).json({
             error: 0,
-            data: data,
+            data,
             message: "Properties fetched successfully.",
             meta: {
-                current_page: page,
-                total : totalItems,
-                per_page :limit,
-                all_pages :allPages,
-                last_page :lastPage,
+                current_page: pageNumber,
+                total: totalItems,
+                per_page: limitNumber,
+                all_pages: allPages,
+                last_page: lastPage,
             },
         });
 
@@ -483,8 +496,7 @@ const GetAllProperty = async (req, res) => {
             status: 500
         });
     }
-   
-}
+};
 const GetOneProperty = async (req, res) => {
     const { id } = req.params
     try {
