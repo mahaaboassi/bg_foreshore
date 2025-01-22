@@ -1,3 +1,4 @@
+const mongoose = require("mongoose")
 const feature = require("../models/feature");
 const property  = require("../models/Property");
 const Type = require("../models/Type");
@@ -431,7 +432,7 @@ const DeleteProperty = async (req, res) => {
 const GetAllProperty = async (req, res) => {
     try {
         // Extract query parameters
-        const { page = 1, limit = 10, city, guests, type } = req.query;
+        const { page = 1, limit = 10, city, guests, type , owner } = req.query;
 
         // Convert page and limit to numbers
         const pageNumber = parseInt(page) || 1;
@@ -442,13 +443,30 @@ const GetAllProperty = async (req, res) => {
 
         // Build search query
         let query = {};
+        if (owner) {
+            if (mongoose.Types.ObjectId.isValid(owner)) {
+                query["owner.id"] = new mongoose.Types.ObjectId(owner);
+            } else {
+                return res.status(400).json({
+                    error: 1,
+                    message: "Invalid owner ID format",
+                    status: 400,
+                });
+            }
+        }
 
-        if (city) query.city = { $regex: city, $options: "i" }; // Case-insensitive city search
-        if (guests) query.guests = parseInt(guests); // Match exact number of guests
+        if (city) {
+            query.city = { $regex: city, $options: "i" }; // Case-insensitive search
+        }
+
+        if (guests) {
+            query.guests = parseInt(guests); // Match exact number of guests
+        }
+
         if (type) {
             query["$or"] = [
-                { "type.name_en": { $regex: type, $options: "i" } }, // Search in English
-                { "type.name_ar": { $regex: type, $options: "i" } }  // Search in Arabic
+                { "type.name_en": { $regex: type, $options: "i" } },
+                { "type.name_ar": { $regex: type, $options: "i" } }
             ];
         }
         // Fetch properties with filters and pagination
@@ -497,6 +515,7 @@ const GetAllProperty = async (req, res) => {
         });
     }
 };
+
 const GetOneProperty = async (req, res) => {
     const { id } = req.params
     try {
@@ -545,5 +564,6 @@ module.exports = {
     DeleteProperty,
     UpdateProperty,
     GetOneProperty,
-    GetAllProperty
+    GetAllProperty,
+     
 }

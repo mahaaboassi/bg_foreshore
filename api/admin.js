@@ -34,6 +34,7 @@ adminRouter.get("/getUser/:id", GetOneUser);
 adminRouter.post("/addProperty", setCategory('property'), authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, AddProperty);
 adminRouter.put("/updateProperty/:id",setCategory('property'),authenticate,authorizeAdmin,uploadMulti,handleFileUploadError,uploadToVercelBlobMulti,UpdateProperty);
 adminRouter.delete("/deleteProperty/:id",  authenticate , authorizeAdmin ,DeleteProperty);
+adminRouter.get("/getAllPropertiesForUser",authenticate, GetAllProperty);
 adminRouter.get("/getAllProperties", GetAllProperty);
 adminRouter.get("/getProperty/:id", GetOneProperty);
 
