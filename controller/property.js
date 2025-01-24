@@ -480,7 +480,6 @@ const GetAllProperty = async (req, res) => {
         // Calculate total pages
         const allPages = Math.ceil(totalItems / limitNumber);
         const lastPage = allPages > 0 ? allPages : 1;
-
         // Check if data exists
         if (!data || data.length === 0) {
             return res.status(404).json({

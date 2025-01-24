@@ -6,6 +6,8 @@ const { Add, Update, Delete, Get, AddSubFeature, UpdateSubFeature, DeleteSubFeat
 const { AddUser, UpdateUser, DeleteUser, GetAllUsers, GetOneUser } = require("../controller/user");
 const { AddProperty, GetOneProperty, GetAllProperty, DeleteProperty, UpdateProperty } = require("../controller/property");
 const { SendList } = require("../controller/sendProperty");
+const { SendMessageToAdmin } = require("../controller/sendMessage");
+const { SendSubscribe } = require("../controller/subscribe");
 
 
 const adminRouter = express.Router();
@@ -40,5 +42,10 @@ adminRouter.get("/getProperty/:id", GetOneProperty);
 
 // // List Property 
 adminRouter.post("/list", setCategory('list'),uploadMulti,handleFileUploadError,uploadToVercelBlobMulti, SendList);
+// // Contact us
+adminRouter.post("/contactUS", SendMessageToAdmin);
+// // Subscribe
+adminRouter.post("/subscribe", SendSubscribe);
+
 
 module.exports = {adminRouter};
