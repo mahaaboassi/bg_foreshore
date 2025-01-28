@@ -242,21 +242,29 @@ const UpdateProperty = async (req, res) => {
               status : 400
             });
           }
-        if (type != undefined && type ==  "" ) {
-            return res.status(400).json({
-            error: 1,
-            data : [],
-            message: "Type field is required.",
-            status : 400
-            });
+        const typeExist = {}
+        if (type != undefined  ) {
+            typeExist = await Type.findById(type)
+            if (!typeExist ) {
+                return res.status(400).json({
+                  error: 1,
+                  data : [],
+                  message: "Type field is required.",
+                  status : 400
+                });
+              }
         }
+        const ownerExist = {}
         if(owner != undefined && owner == "" ){
-            return res.status(400).json({
-                error: 1,
-                data : [],
-                message: "Owner field is required.",
-                status : 400
-            });
+            ownerExist = await User.findById(owner)
+            if (!ownerExist) {
+                return res.status(400).json({
+                  error: 1,
+                  data : [],
+                  message: "Owner field is required.",
+                  status : 400
+                });
+              }
         }
         if ((furnishing  != undefined &&  !['1', '0'].includes(furnishing)) || ( ready != undefined &&  !['1', '0'].includes(ready)) ) {
         return res.status(400).json({
@@ -338,10 +346,10 @@ const UpdateProperty = async (req, res) => {
             name_en : name_en ?? existingProperty.name_en,
             description_ar : description_ar ?? existingProperty.description_ar,
             description_en : description_en ?? existingProperty.description_en,
-            type : type ?? existingProperty.type,
+            type : Object.keys(typeExist).length>0 ? typeExist : existingProperty.type,
             furnishing : furnishing ?? existingProperty.furnishing,
             ready : ready ?? existingProperty.ready,
-            owner : owner ?? existingProperty.owner,
+            owner : Object.keys(ownerExist).length>0 ? ownerExist : existingProperty.owner,
             bathrooms : bathrooms ?? existingProperty.bathrooms,
             bedrooms : bedrooms ?? existingProperty.bedrooms,
             beds : beds ?? existingProperty.beds,
