@@ -191,7 +191,7 @@ const AddProperty = async (req,res)=>{
 }
 const UpdateProperty = async (req, res) => {
     const { id } = req.params; // Get the ID from the URL parameter
-    const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing , ready , owner , rms_link,
+    const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing,registration_number , ready , owner , rms_link,
         bathrooms ,bedrooms , beds , guests , city , region, street, building , floor  } = req.body
 
     try {
