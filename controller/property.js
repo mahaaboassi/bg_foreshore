@@ -291,7 +291,7 @@ const UpdateProperty = async (req, res) => {
             });
         }
        
-       
+        const featuresArray = []
           if( features != undefined  && features.length>0){
             for (const element of features || []) {
                 const featureRootExist = await feature.findById(element.id)
