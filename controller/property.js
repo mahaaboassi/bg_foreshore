@@ -282,10 +282,12 @@ const UpdateProperty = async (req, res) => {
                             status: 400,
                           }); 
                     }
-                    children.push({id : subFeatureExist._id,
+                    children.push({
+                        id : subFeatureExist._id,
                         name_ar : subFeatureExist.name_ar,
                         name_en : subFeatureExist.name_en,
-                        file : subFeatureExist.photo,})
+                        icon : subFeatureExist.icon,
+                    })
                 }
                 featuresArray.push({
                     id : featureRootExist._id,
