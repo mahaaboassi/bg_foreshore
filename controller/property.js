@@ -346,10 +346,20 @@ const UpdateProperty = async (req, res) => {
             name_en : name_en ?? existingProperty.name_en,
             description_ar : description_ar ?? existingProperty.description_ar,
             description_en : description_en ?? existingProperty.description_en,
-            type : Object.keys(typeExist).length>0 ? typeExist : existingProperty.type,
+            type : Object.keys(typeExist).length>0 ? {
+                _id :typeExist._id,
+                name_en : typeExist.name_en,
+                name_ar : typeExist.name_ar,
+                description_en : typeExist.description_en,
+                description_ar : typeExist.description_ar
+            } : existingProperty.type,
             furnishing : furnishing ?? existingProperty.furnishing,
             ready : ready ?? existingProperty.ready,
-            owner : Object.keys(ownerExist).length>0 ? ownerExist : existingProperty.owner,
+            owner : Object.keys(ownerExist).length>0 ? {
+                id : ownerExist._id,
+                name  : ownerExist.name,
+                email : ownerExist.email,
+            } : existingProperty.owner,
             bathrooms : bathrooms ?? existingProperty.bathrooms,
             bedrooms : bedrooms ?? existingProperty.bedrooms,
             beds : beds ?? existingProperty.beds,
