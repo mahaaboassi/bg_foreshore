@@ -15,6 +15,13 @@ const authenticate = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded; // Attach decoded user info to request
+        // If the token is expired and we want to refresh it
+        const isTokenExpired = decoded.exp * 1000 < Date.now(); // Check if the token has expired
+        if (isTokenExpired) {
+            const refreshedToken = jwt.sign({ userId: decoded.userId, role: decoded.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            res.setHeader('Authorization', `Bearer ${refreshedToken}`); // Send the new token in the response header
+        }
+  
         next();
     } catch (error) {
         const message = error.name === "TokenExpiredError" ? "Token has expired." : "Authentication failed.";
