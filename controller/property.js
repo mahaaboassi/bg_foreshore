@@ -242,7 +242,7 @@ const UpdateProperty = async (req, res) => {
               status : 400
             });
           }
-        const typeExist = {}
+        let typeExist = {}
         if (type != undefined  ) {
             typeExist = await Type.findById(type)
             if (!typeExist ) {
@@ -254,7 +254,7 @@ const UpdateProperty = async (req, res) => {
                 });
               }
         }
-        const ownerExist = {}
+        let ownerExist = {}
         if(owner != undefined && owner == "" ){
             ownerExist = await User.findById(owner)
             if (!ownerExist) {
