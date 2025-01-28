@@ -191,7 +191,7 @@ const AddProperty = async (req,res)=>{
 }
 const UpdateProperty = async (req, res) => {
     const { id } = req.params; // Get the ID from the URL parameter
-    const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing , ready , owner ,
+    const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing , ready , owner , rms_link,
         bathrooms ,bedrooms , beds , guests , city , region, street, building , floor  } = req.body
 
     try {
@@ -226,14 +226,46 @@ const UpdateProperty = async (req, res) => {
                 status : 400
               });
         }
-          if ((furnishing  != undefined &&  !['1', '0'].includes(furnishing)) || ( ready != undefined &&  !['1', '0'].includes(ready)) ) {
+        if (rms_link != undefined && rms_link == "") {
             return res.status(400).json({
               error: 1,
               data : [],
-              message: "( Furnishing and Ready ) fields are required.",
+              message: "Rms Link field is required.",
               status : 400
             });
           }
+        if (registration_number != undefined && registration_number == "") {
+            return res.status(400).json({
+              error: 1,
+              data : [],
+              message: "Registration Number field is required.",
+              status : 400
+            });
+          }
+        if (type != undefined && type ==  "" ) {
+            return res.status(400).json({
+            error: 1,
+            data : [],
+            message: "Type field is required.",
+            status : 400
+            });
+        }
+        if(owner != undefined && owner == "" ){
+            return res.status(400).json({
+                error: 1,
+                data : [],
+                message: "Owner field is required.",
+                status : 400
+            });
+        }
+        if ((furnishing  != undefined &&  !['1', '0'].includes(furnishing)) || ( ready != undefined &&  !['1', '0'].includes(ready)) ) {
+        return res.status(400).json({
+            error: 1,
+            data : [],
+            message: "( Furnishing and Ready ) fields are required.",
+            status : 400
+        });
+        }
           
           const isValidNumber = (value) => {
             return value != null && !isNaN(value) && /^[0-9]+$/.test(value.toString());
@@ -258,7 +290,8 @@ const UpdateProperty = async (req, res) => {
                 status : 400
             });
         }
-          const featuresArray = []
+       
+       
           if( features != undefined  && features.length>0){
             for (const element of features || []) {
                 const featureRootExist = await feature.findById(element.id)
@@ -318,6 +351,8 @@ const UpdateProperty = async (req, res) => {
             street : street ?? existingProperty.street,
             building : building ?? existingProperty.building,
             floor : floor ?? existingProperty.floor,
+            rms_link : rms_link ?? existingProperty.rms_link,
+            registration_number : registration_number ?? existingProperty.registration_number,
             features : featuresArray.length>0 ?featuresArray : existingProperty.features 
         };
         
