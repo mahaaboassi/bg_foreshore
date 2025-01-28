@@ -8,7 +8,7 @@ const User = require("../models/User")
 const AddProperty = async (req,res)=>{
     const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing , ready , owner ,
          bathrooms,link_map ,bedrooms,registration_number , beds , guests , city , region, street, building , floor  } = req.body
-
+         
      try {
             if (!name_ar || !name_en) {
               return res.status(400).json({
@@ -192,8 +192,8 @@ const AddProperty = async (req,res)=>{
 const UpdateProperty = async (req, res) => {
     const { id } = req.params; // Get the ID from the URL parameter
     const {name_ar, name_en , description_ar , description_en, features , type , files , furnishing,registration_number , ready , owner , rms_link,
-        bathrooms ,bedrooms , beds , guests , city , region, street, building , floor  } = req.body
-
+        bathrooms ,bedrooms , beds , guests , city , region, street, building , floor  } = req.body 
+        console.log(req.body);
     try {
 
         // Check if the id is provided
@@ -255,7 +255,7 @@ const UpdateProperty = async (req, res) => {
               }
         }
         let ownerExist = {}
-        if(owner != undefined && owner == "" ){
+        if(owner != undefined ){
             ownerExist = await User.findById(owner)
             if (!ownerExist) {
                 return res.status(400).json({
@@ -266,6 +266,7 @@ const UpdateProperty = async (req, res) => {
                 });
               }
         }
+        
         if ((furnishing  != undefined &&  !['1', '0'].includes(furnishing)) || ( ready != undefined &&  !['1', '0'].includes(ready)) ) {
         return res.status(400).json({
             error: 1,
@@ -298,6 +299,7 @@ const UpdateProperty = async (req, res) => {
                 status : 400
             });
         }
+        console.log(rms_link);
        
         const featuresArray = []
           if( features != undefined  && features.length>0){
@@ -340,6 +342,8 @@ const UpdateProperty = async (req, res) => {
                 
             } 
           }
+          
+          
         // Merge existing data with the new data, only updating provided fields
         const updatedData = {
             name_ar : name_ar ?? existingProperty.name_ar,
@@ -373,6 +377,7 @@ const UpdateProperty = async (req, res) => {
             registration_number : registration_number ?? existingProperty.registration_number,
             features : featuresArray.length>0 ?featuresArray : existingProperty.features 
         };
+        console.log("Update Data",updatedData);
         
         // Find and delete the user by id
         const propertyToUpdate = await property.findOneAndUpdate(
